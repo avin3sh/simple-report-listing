@@ -59,7 +59,9 @@ export default class index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      allreports: reports
+      query: '',
+      allreports: reports,
+      screenResult: reports
     }
 
   }
@@ -71,7 +73,7 @@ export default class index extends Component {
 
   _renderReportsList() {
     return (
-      reports.map(report => {
+      this.state.screenResult.map(report => {
         return (
           <TouchableOpacity>
             <ReportCard report={report} />
@@ -85,14 +87,25 @@ export default class index extends Component {
     return (
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TextInput
-            placeholder="Enter a keyword..."
-            style={{ height: 30 }}
-          />
+          <View style={{ flexDirection: 'column' }}>
+            <TextInput
+              value={this.state.query}
+              placeholder="Enter a keyword..."
+              style={{ height: 30, width: 250, borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }}
+              onChangeText={(value) => {
+                this.setState({
+                  query: value
+                })
+              }}
+            />
+
+          </View>
+
           <Button
             title="Search"
             style={{ height: 30 }}
             color='#858080'
+            onPress={() => { this.search() }}
           />
         </View>
 
@@ -100,11 +113,14 @@ export default class index extends Component {
         <View style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text>SORTY BY: </Text>
-            <Picker style={{ height: 35, color: '#858080' }}>
-              <Picker.Item label="Recent First" />
-              <Picker.Item label="Oldest First" />
-              <Picker.Item label="Cost - Low" />
-              <Picker.Item label="Cost - High" />
+            <Picker
+              style={{ height: 35, color: '#858080' }}
+              onValueChange={(itemValue, itemIndex) => { this.sortResult(itemValue); }}>
+              >
+              <Picker.Item label="Recent First" value="rf" />
+              <Picker.Item label="Oldest First" value="of" />
+              <Picker.Item label="Cost - Low" value="cl" />
+              <Picker.Item label="Cost - High" value="ch" />
             </Picker>
           </View>
           <Text>&nbsp;</Text>
@@ -118,6 +134,48 @@ export default class index extends Component {
         </View>
       </View>
     )
+  }
+
+  search() {
+    const q = this.state.query.trim();
+    let searchResult = [];
+    if (q.length !== 0) {
+    }
+  }
+
+  sortResult(criteria) {
+    let currResult = this.state.screenResult;
+    let result = currResult;
+
+    if (criteria === 'rf' || criteria === 'of') {
+      currResult.sort(function (a, b) {
+        a = new Date(a.published_on);
+        b = new Date(b.published_on);
+        return a > b ? -1 : a < b ? 1 : 0;
+      });
+
+      if (criteria === 'of')
+        result = currResult.reverse();
+      else
+        result = currResult;
+    } else {
+
+      currResult.sort(function (a, b) {
+        a = a.cost;
+        b = b.cost;
+        return a < b ? -1 : a > b ? 1 : 0;
+      });
+
+      if (criteria === 'ch')
+        result = currResult.reverse();
+      else
+        result = currResult;
+    }
+
+    this.setState({
+      screenResult: result
+    })
+
   }
 
   componentDidMount() {
@@ -144,7 +202,6 @@ export default class index extends Component {
           </View>
 
           <View style={styles.resultArea}>
-
             {this._renderManipulators()}
             <View style={styles.hrSecondary} />
             {this._renderReportsList()}
