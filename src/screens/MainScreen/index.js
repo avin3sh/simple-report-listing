@@ -67,7 +67,7 @@ export default class index extends Component {
       showFilterModal: false,
 
       //sorting
-      sortingCriteria: 'rf'
+      sortingCriteria: 'rf',
 
       //modalvalues
       costLowerlimit: R.meta.MIN_REPORT_COST,
@@ -148,7 +148,7 @@ export default class index extends Component {
               style={{ height: 30 }}
               color='#858080'
               onPress={() => {
-                this.setState({ showFilterModal: true })
+                this.setState({ showFilterModal: !this.state.showFilterModal })
               }}
             />
           </View>
@@ -224,6 +224,7 @@ export default class index extends Component {
           <Text>&nbsp; &nbsp;</Text>
           <Button
             title="Cancel"
+            onPress={() => this.setState({ showFilterModal: false })}
           />
         </View>
 
@@ -239,6 +240,7 @@ export default class index extends Component {
       },
         () => {
           this._applyFilter();
+          this.setState({ showFilterModal: false })
         })
     } else {
       alert("Please enter date range in yyyy-mm-dd format")
@@ -246,7 +248,7 @@ export default class index extends Component {
   }
 
   _applyFilter() {
-    let result = this.state.allreports.filter(report => {
+    let result = this.state.screenResult.filter(report => {
       return report.published_on >= this.state.date_from && report.published_on <= this.state.date_till && report.cost >= this.state.costLowerlimit && report.cost <= this.state.costUpperLimit;
     })
 
@@ -257,13 +259,22 @@ export default class index extends Component {
 
   search() {
     const q = this.state.query.trim();
-    let searchResult = [];
+    const db = this.state.allreports;
+
     if (q.length !== 0) {
+      let result = db.filter(report => {
+        let text = report.title + ' ' + report.description
+        return text.includes(q);
+      })
+
+      this.setState({ screenResult: result })
+    } else {
+      this.setState({ screenResult: this.state.allreports })
     }
   }
 
   sortResult(criteria = this.state.sortingCriteria) {
-    let currResult = this.state.allreports;
+    let currResult = this.state.screenResult;
     let result = currResult;
 
     if (criteria === 'rf' || criteria === 'of') {
