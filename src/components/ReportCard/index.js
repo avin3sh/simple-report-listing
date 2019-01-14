@@ -17,38 +17,38 @@ export default function index(props) {
     const report = props.report;
     return (
         <View style={styles.card}>
-            <View>
-                <Image source={{ uri: report.image }} style={{ width: 120, height: 150 }} />
-            </View>
-
+            <Image source={{ uri: report.image }} style={{ width: 120, height: 150 }} />
             <View style={styles.content}>
                 <Text style={styles.title}>{report.title}</Text>
                 <Text style={styles.description}>{report.description}</Text>
                 <Text style={styles.published}>{R.report_card.PUBLISHED_LABEL}: {getMonthYear(report.published_on)}</Text>
                 <Text style={styles.cost}>{R.report_card.COST_LABEL}: {report.currency}{report.cost}</Text>
             </View>
-
-
-        </View>
+        </View >
     );
 }
 
 const styles = StyleSheet.create({
     card: {
         flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
         border: 1,
         borderColor: '#ededed',
         backgroundColor: '#f6f6f6',
         padding: 10,
         marginBottom: 5,
+        width: '100%',
+        flexWrap: 'wrap'
+
     },
 
     content: {
         flexDirection: 'column',
         justifyContent: 'center',
         marginLeft: 8,
-        maxWidth: '100%'
+        width:'85%',
+        maxWidth: '100%',
     },
 
     title: {
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
 
     description: {
         fontSize: 14,
-        marginBottom: 5
+        marginBottom: 5,
     },
 
     published: {

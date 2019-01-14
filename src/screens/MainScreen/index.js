@@ -98,13 +98,19 @@ export default class index extends Component {
 
   _renderManipulators() {
     return (
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'column' }}>
             <TextInput
               value={this.state.query}
               placeholder={R.dashboard.result_manipulators.SEARCHBOX_PLACEHOLDER}
               style={{ height: 30, width: 250, borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  this.search();
+                }
+
+              }}
               onChangeText={(value) => {
                 this.setState({
                   query: value
@@ -123,7 +129,7 @@ export default class index extends Component {
         </View>
 
 
-        <View style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', justifyContent: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text>{R.dashboard.result_manipulators.SORT_LABEL}: </Text>
             <Picker
