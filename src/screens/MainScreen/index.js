@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Picker, Button, TextIn
 import ReportCard from '../../components/ReportCard';
 
 import R from '../../res/Constants';
+import DateTime from '../../utils/DateTime';
 
 const sample_image_url = "https://cdn.pixabay.com/photo/2016/03/15/09/08/quality-control-1257235__340.jpg";
 
@@ -62,7 +63,18 @@ export default class index extends Component {
     this.state = {
       query: '',
       allreports: reports,
-      screenResult: reports
+      screenResult: reports,
+      showFilterModal: false,
+
+      //sorting
+      sortingCriteria: 'rf'
+
+      //modalvalues
+      costLowerlimit: R.meta.MIN_REPORT_COST,
+      costUpperLimit: R.meta.MAX_REPORT_COST,
+      date_from: new Date('2010-01-01'),
+      date_till: new Date(),
+
     }
 
   }
@@ -115,8 +127,13 @@ export default class index extends Component {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text>{R.dashboard.result_manipulators.SORT_LABEL}: </Text>
             <Picker
+              selectedValue={this.state.sortingCriteria}
               style={{ height: 35, color: '#858080' }}
-              onValueChange={(itemValue, itemIndex) => { this.sortResult(itemValue); }}>
+              onValueChange={(itemValue, itemIndex) => {
+                this.setState({ sortingCriteria: itemValue }, () => {
+                  this.sortResult();
+                })
+              }}>
               >
               <Picker.Item label={R.dashboard.result_manipulators.sort_criterias.RECENT_FIRST} value="rf" />
               <Picker.Item label={R.dashboard.result_manipulators.sort_criterias.OLDEST_FIRST} value="of" />
@@ -130,11 +147,112 @@ export default class index extends Component {
               title={R.dashboard.result_manipulators.FILTER_BUTTON_LABEL}
               style={{ height: 30 }}
               color='#858080'
+              onPress={() => {
+                this.setState({ showFilterModal: true })
+              }}
             />
           </View>
         </View>
       </View>
     )
+  }
+
+  _renderFilterModal() {
+    return (
+      <View style={{ flexDirection: 'column', justifyContent: 'center', }}>
+
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTextLabelStyle}>Cost: </Text>
+          <Text style={styles.modalTextLabelStyle}>$</Text>
+          <TextInput value={this.state.costLowerlimit}
+            placeholder={this.state.costLowerlimit}
+            onChangeText={(text) => {
+              this.setState({
+                costLowerlimit: text.replace(/[^0-9]/g, ''),
+              });
+            }}
+            style={[styles.modalTextInputStyle, { width: 50 }]}
+          />
+          <Text style={styles.modalTextLabelStyle}> - </Text>
+          <Text style={styles.modalTextLabelStyle}>$</Text>
+          <TextInput
+            value={this.state.costUpperLimit}
+            placeholder={this.state.costUpperLimit}
+            onChangeText={(text) => {
+              this.setState({
+                costUpperLimit: text.replace(/[^0-9]/g, ''),
+              });
+            }}
+            style={[styles.modalTextInputStyle, { width: 50 }]}
+          />
+        </View>
+
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTextLabelStyle}>Date Range: </Text>
+
+          <TextInput
+            ref="date_from_box"
+            placeholder={DateTime.toISOFormat(this.state.date_from)}
+            onChangeText={(text) => {
+              this.setState({
+                date_from: text
+              })
+            }}
+            style={[styles.modalTextInputStyle, { width: 100 }]}
+          />
+
+          <Text style={styles.modalTextLabelStyle}> - </Text>
+
+          <TextInput
+            ref="date_to_box"
+            placeholder={DateTime.toISOFormat(this.state.date_till)}
+            onChangeText={(text) => {
+              this.setState({
+                date_till: text
+              })
+            }}
+            style={[styles.modalTextInputStyle, { width: 100 }]}
+          />
+
+        </View>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Button
+            title="Apply"
+            onPress={() => this._verifyDate()}
+          />
+          <Text>&nbsp; &nbsp;</Text>
+          <Button
+            title="Cancel"
+          />
+        </View>
+
+      </View>
+    );
+  }
+
+  _verifyDate() {
+    if (DateTime.isValidDate(this.state.date_from) && DateTime.isValidDate(this.state.date_till)) {
+      this.setState({
+        date_from: new Date(this.state.date_from),
+        date_till: new Date(this.state.date_till)
+      },
+        () => {
+          this._applyFilter();
+        })
+    } else {
+      alert("Please enter date range in yyyy-mm-dd format")
+    }
+  }
+
+  _applyFilter() {
+    let result = this.state.allreports.filter(report => {
+      return report.published_on >= this.state.date_from && report.published_on <= this.state.date_till && report.cost >= this.state.costLowerlimit && report.cost <= this.state.costUpperLimit;
+    })
+
+    this.setState({
+      screenResult: result
+    })
   }
 
   search() {
@@ -144,7 +262,7 @@ export default class index extends Component {
     }
   }
 
-  sortResult(criteria) {
+  sortResult(criteria = this.state.sortingCriteria) {
     let currResult = this.state.allreports;
     let result = currResult;
 
@@ -191,6 +309,7 @@ export default class index extends Component {
   render() {
     return (
       <View style={styles.container}>
+        {this.state.showFilterModal && this._renderFilterModal()}
         <View ref='header' style={styles.headerArea}>
           <Image source={require('../../assets/logo.png')} style={{ width: 240, height: 30 }} />
           <Text>{R.meta.COMPANY_CONTACT}</Text>
@@ -259,5 +378,20 @@ const styles = StyleSheet.create({
 
   resultArea: {
 
+  },
+
+  modalContent: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
+
+  modalTextInputStyle: {
+    height: 30,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#c5c8cb',
+    fontSize: 18
+  },
+
+  modalTextLabelStyle: {
+    fontSize: 18
   }
 })

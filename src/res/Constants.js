@@ -1,8 +1,10 @@
 const R = {
 
-    meta:{
+    meta: {
         TOOL_NAME: 'Report Search Tool',
-        COMPANY_CONTACT: '+1 617-765-2493'
+        COMPANY_CONTACT: '+1 617-765-2493',
+        MIN_REPORT_COST: 0,
+        MAX_REPORT_COST: 10000
     },
 
     dashboard: {
