@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, Picker, Button, TextIn
 
 import ReportCard from '../../components/ReportCard';
 
+import R from '../../res/Constants';
+
 const sample_image_url = "https://cdn.pixabay.com/photo/2016/03/15/09/08/quality-control-1257235__340.jpg";
-const company_contact_number = '+1 617-765-2493';
 
 const reports = [
   {
@@ -90,7 +91,7 @@ export default class index extends Component {
           <View style={{ flexDirection: 'column' }}>
             <TextInput
               value={this.state.query}
-              placeholder="Enter a keyword..."
+              placeholder={R.dashboard.result_manipulators.SEARCHBOX_PLACEHOLDER}
               style={{ height: 30, width: 250, borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }}
               onChangeText={(value) => {
                 this.setState({
@@ -102,7 +103,7 @@ export default class index extends Component {
           </View>
 
           <Button
-            title="Search"
+            title={R.dashboard.result_manipulators.SEARCH_BUTTON_LABEL}
             style={{ height: 30 }}
             color='#858080'
             onPress={() => { this.search() }}
@@ -112,21 +113,21 @@ export default class index extends Component {
 
         <View style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text>SORTY BY: </Text>
+            <Text>{R.dashboard.result_manipulators.SORT_LABEL}: </Text>
             <Picker
               style={{ height: 35, color: '#858080' }}
               onValueChange={(itemValue, itemIndex) => { this.sortResult(itemValue); }}>
               >
-              <Picker.Item label="Recent First" value="rf" />
-              <Picker.Item label="Oldest First" value="of" />
-              <Picker.Item label="Cost - Low" value="cl" />
-              <Picker.Item label="Cost - High" value="ch" />
+              <Picker.Item label={R.dashboard.result_manipulators.sort_criterias.RECENT_FIRST} value="rf" />
+              <Picker.Item label={R.dashboard.result_manipulators.sort_criterias.OLDEST_FIRST} value="of" />
+              <Picker.Item label={R.dashboard.result_manipulators.sort_criterias.COST_LOW} value="cl" />
+              <Picker.Item label={R.dashboard.result_manipulators.sort_criterias.COST_HIGH} value="ch" />
             </Picker>
           </View>
           <Text>&nbsp;</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Button
-              title="🔧FILTER"
+              title={R.dashboard.result_manipulators.FILTER_BUTTON_LABEL}
               style={{ height: 30 }}
               color='#858080'
             />
@@ -144,7 +145,7 @@ export default class index extends Component {
   }
 
   sortResult(criteria) {
-    let currResult = this.state.screenResult;
+    let currResult = this.state.allreports;
     let result = currResult;
 
     if (criteria === 'rf' || criteria === 'of') {
@@ -192,13 +193,13 @@ export default class index extends Component {
       <View style={styles.container}>
         <View ref='header' style={styles.headerArea}>
           <Image source={require('../../assets/logo.png')} style={{ width: 240, height: 30 }} />
-          <Text>{company_contact_number}</Text>
+          <Text>{R.meta.COMPANY_CONTACT}</Text>
         </View>
         <View style={styles.hr} />
 
         <View ref='content' style={styles.content}>
           <View style={styles.contentHeader}>
-            <Text style={styles.mainTitle}>Report Search Tool</Text>
+            <Text style={styles.mainTitle}>{R.meta.TOOL_NAME}</Text>
           </View>
 
           <View style={styles.resultArea}>

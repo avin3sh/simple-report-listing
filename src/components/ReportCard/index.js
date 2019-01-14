@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import R from '../../res/Constants';
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -23,8 +24,8 @@ export default function index(props) {
             <View style={styles.content}>
                 <Text style={styles.title}>{report.title}</Text>
                 <Text style={styles.description}>{report.description}</Text>
-                <Text style={styles.published}>PUBLISHED: {getMonthYear(report.published_on)}</Text>
-                <Text style={styles.cost}>COST OF REPORT: {report.currency}{report.cost}</Text>
+                <Text style={styles.published}>{R.report_card.PUBLISHED_LABEL}: {getMonthYear(report.published_on)}</Text>
+                <Text style={styles.cost}>{R.report_card.COST_LABEL}: {report.currency}{report.cost}</Text>
             </View>
 
 
