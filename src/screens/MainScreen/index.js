@@ -2,71 +2,36 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Picker, Button, TextInput } from 'react-native';
 
 import ReportCard from '../../components/ReportCard';
+import ContentCard from '../../components/ContentCard';
 
 import R from '../../res/Constants';
 import DateTime from '../../utils/DateTime';
 
-const sample_image_url = "https://cdn.pixabay.com/photo/2016/03/15/09/08/quality-control-1257235__340.jpg";
-
-const reports = [
-  {
-    id: 101,
-    image: sample_image_url,
-    title: 'This is an example title for some research 2019-2020',
-    description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.',
-    currency: '$',
-    cost: 4250,
-    published_on: new Date('2018-10-01')
-  },
-  {
-    id: 102,
-    image: sample_image_url,
-    title: 'This is an example title for some research 2014-2016',
-    description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.',
-    currency: '$',
-    cost: 5190,
-    published_on: new Date('2017-12-01')
-  },
-  {
-    id: 103,
-    image: sample_image_url,
-    title: 'This is the third report of something happened in 2009-2014',
-    description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.',
-    currency: '$',
-    cost: 3588,
-    published_on: new Date('2014-10-01')
-  },
-  {
-    id: 104,
-    image: sample_image_url,
-    title: 'This is fourth example report for some research 2011-2012',
-    description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.',
-    currency: '$',
-    cost: 1200,
-    published_on: new Date('2013-08-01')
-  },
-  {
-    id: 105,
-    image: sample_image_url,
-    title: 'This is an example report - fifth one - for some research 2010-2012',
-    description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.',
-    currency: '$',
-    cost: 350,
-    published_on: new Date('2013-06-01')
-  }
-]
-
+const placeholdeReport = {
+  "id": "0",
+  "image": "http://lorempixel.com/640/480/abstract",
+  "title": "...",
+  "description": "...",
+  "currency": "$",
+  "cost": 0,
+  "published_on": "2018-01-01T01:01:01.053Z"
+};
 export default class index extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       query: '',
-      allreports: reports,
-      screenResult: reports,
+      allreports: [],
+      screenResult: [],
+
+      //flags
       showFilterModal: false,
+      firstLoad: false,
+      searching: false,
 
       //individual report modal
+      report: placeholdeReport,
       showContentModal: false,
       fetchingReport: true,
 
@@ -79,10 +44,21 @@ export default class index extends Component {
       date_from: new Date('2010-01-01'),
       date_till: new Date(),
 
-      //
-
     }
 
+  }
+
+  _resetManipulators() {
+    this.setState({
+      // sorting
+      sortingCriteria: 'rf',
+
+      //filterValues
+      costLowerlimit: R.meta.MIN_REPORT_COST,
+      costUpperLimit: R.meta.MAX_REPORT_COST,
+      date_from: new Date('2010-01-01'),
+      date_till: new Date(),
+    })
   }
 
   _handleResize = () => this.setState({
@@ -100,8 +76,26 @@ export default class index extends Component {
 
   _renderLoadingGif() {
     return (
-      <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingGif}>
         <Image source={require('../../assets/loading.gif')} style={{ height: 255, width: 255 }} />
+      </View>
+    )
+  }
+
+  _renderResultHelper() {
+
+    let msg = '';
+
+    if (this.state.firstLoad && !this.state.searching) {
+
+      if ((this.state.query.trim().length !== 0 && this.state.screenResult.length === 0)) {
+        msg = R.dashboard.result_area.NO_RESULT
+      }
+    }
+
+    return (
+      <View style={styles.resultHelper}>
+        <Text style={styles.modalTextLabelStyle}>{msg}</Text>
       </View>
     )
   }
@@ -124,17 +118,25 @@ export default class index extends Component {
       fetchingReport: true
     }, () => {
 
+      fetch(R.meta.api.URL + id)
+        .then(resp => resp.json())
+        .then(reportJson => {
+          this.setState({
+            report: reportJson
+          }, () => this.setState({ fetchingReport: false }))
+        })
+        .catch(err => {
+          console.log(err);
+          alert(R.dashboard.errors.INDIVIDUAL_REPORT_FETCH_ERROR);
+        })
+
     })
 
   }
 
   _renderManipulators() {
     return (
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-      }}>
+      <View style={styles.resultManipulatorContainer}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'column' }}>
             <TextInput
@@ -283,13 +285,14 @@ export default class index extends Component {
           this.setState({ showFilterModal: false })
         })
     } else {
-      alert("Please enter date range in yyyy-mm-dd format")
+      alert(R.dashboard.errors.INVALID_DATE_FORMAT_ERROR)
     }
   }
 
   _applyFilter() {
     let result = this.state.screenResult.filter(report => {
-      return report.published_on >= this.state.date_from && report.published_on <= this.state.date_till && report.cost >= this.state.costLowerlimit && report.cost <= this.state.costUpperLimit;
+      let d = new Date(report.published_on)
+      return d >= this.state.date_from && d <= this.state.date_till && report.cost >= this.state.costLowerlimit && report.cost <= this.state.costUpperLimit;
     })
 
     this.setState({
@@ -300,17 +303,29 @@ export default class index extends Component {
   search() {
     const q = this.state.query.trim();
     const db = this.state.allreports;
+    let result = [];
+    this.setState({ searching: true })
 
     if (q.length !== 0) {
-      let result = db.filter(report => {
+      result = db.filter(report => {
         let text = report.title + ' ' + report.description
         return text.includes(q);
       })
 
-      this.setState({ screenResult: result })
     } else {
-      this.setState({ screenResult: this.state.allreports })
+      result = db;
     }
+
+    this.setState({ screenResult: result },
+      () => {
+        this.setState({
+          searching: false
+        });
+        this._resetManipulators();
+      }
+    )
+
+
   }
 
   sortResult(criteria = this.state.sortingCriteria) {
@@ -354,6 +369,23 @@ export default class index extends Component {
   }
 
   componentWillMount() {
+
+    fetch(R.meta.api.URL)
+      .then(resp => resp.json())
+      .then(reportsJson => {
+
+        this.setState({
+          allreports: reportsJson,
+          screenResult: reportsJson,
+        },
+          () => { this.setState({ firstLoad: true }) }
+        )
+      })
+      .catch(err => {
+        console.log(err);
+        alert(R.dashboard.errors.FIRST_LOAD_FETCH_ERROR);
+      })
+
     window.removeEventListener('resize', this._handleResize);
   }
 
@@ -380,13 +412,17 @@ export default class index extends Component {
               <View style={styles.hrSecondary} />
             </View>
             <View>
-              {this._renderReportsList()}
+              {this._renderResultHelper()}
+              {(!this.state.firstLoad || this.state.searching) && this._renderLoadingGif()}
+              {(this.state.firstLoad && !this.state.searching) && this._renderReportsList()}
             </View>
           </View>
         </View>
 
+
         <Modal show={this.state.showContentModal} handleClose={this._hideModal} >
           {this.state.fetchingReport && this._renderLoadingGif()}
+          {(this.state.showContentModal && !this.state.fetchingReport) ? (<ContentCard report={this.state.report} />) : null}
         </Modal>
 
       </View>
@@ -478,5 +514,23 @@ const styles = StyleSheet.create({
 
   modalTextLabelStyle: {
     fontSize: 18
-  }
+  },
+
+  loadingGif: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  resultHelper: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  resultManipulatorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+  },
 })

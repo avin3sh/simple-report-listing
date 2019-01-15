@@ -4,7 +4,10 @@ const R = {
         TOOL_NAME: 'Report Search Tool',
         COMPANY_CONTACT: '+1 617-765-2493',
         MIN_REPORT_COST: 0,
-        MAX_REPORT_COST: 10000
+        MAX_REPORT_COST: 10000,
+        api: {
+            URL: 'https://5c3c5b9d29429300143fe4c3.mockapi.io/api/v1/reports/',
+        }
     },
 
     dashboard: {
@@ -20,6 +23,16 @@ const R = {
                 COST_LOW: 'Cost - Low',
                 COST_HIGH: 'Cost - High'
             }
+        },
+
+        result_area: {
+            NO_RESULT: 'Sorry, your query resulted in nothing!'
+        },
+
+        errors: {
+            FIRST_LOAD_FETCH_ERROR: 'Unable to communicate with our server, please try again later',
+            INDIVIDUAL_REPORT_FETCH_ERROR: 'Some error occured while retrieving the details, please try again later.',
+            INVALID_DATE_FORMAT_ERROR: 'Please enter date range in yyyy-mm-dd format'
         }
 
     },
