@@ -105,9 +105,9 @@ export default class index extends Component {
     return (
       this.state.screenResult.map(report => {
         return (
-          <div className="cardHolder" onClick={() => this._getReport(report.id)}>
+          <section onClick={() => this._getReport(report.id)}>
             <ReportCard report={report} />
-          </div>
+          </section>
         );
       })
     )
@@ -453,10 +453,12 @@ const Modal = ({ handleClose, show, children }) => {
   const showHideClassName = show ? "modal display-block" : "modal display-none";
 
   return (
-    <div className={showHideClassName}>
+    <div className={showHideClassName} onClick={handleClose}>
       <section className="modal-main">
         {children}
-        <Button title="Close" onPress={handleClose} />
+        <TouchableOpacity onPress={handleClose}>
+          <Button title="Close" />
+        </TouchableOpacity>
       </section>
     </div>
   );
