@@ -43,6 +43,7 @@ export default class index extends Component {
       costUpperLimit: R.meta.MAX_REPORT_COST,
       date_from: new Date('2010-01-01'),
       date_till: new Date(),
+      filterActive: false,
 
     }
 
@@ -195,9 +196,27 @@ export default class index extends Component {
                 this.setState({ showFilterModal: !this.state.showFilterModal })
               }}
             />
+            {this.state.filterActive && this._renderFilterClearBtn()}
           </View>
         </View>
       </View>
+    )
+  }
+
+  _renderFilterClearBtn() {
+    return (
+      <TouchableOpacity onPress={() => {
+        this.setState({
+          //filterValues
+          costLowerlimit: R.meta.MIN_REPORT_COST,
+          costUpperLimit: R.meta.MAX_REPORT_COST,
+          date_from: new Date('2010-01-01'),
+          date_till: new Date(),
+          filterActive: false
+        }, () => this._applyFilter())
+      }}>
+        <Text>clear</Text>
+      </TouchableOpacity>
     )
   }
 
@@ -282,7 +301,7 @@ export default class index extends Component {
       },
         () => {
           this._applyFilter();
-          this.setState({ showFilterModal: false })
+          this.setState({ showFilterModal: false, filterActive: true })
         })
     } else {
       alert(R.dashboard.errors.INVALID_DATE_FORMAT_ERROR)
@@ -290,7 +309,7 @@ export default class index extends Component {
   }
 
   _applyFilter() {
-    let result = this.state.screenResult.filter(report => {
+    let result = this.state.allreports.filter(report => {
       let d = new Date(report.published_on)
       return d >= this.state.date_from && d <= this.state.date_till && report.cost >= this.state.costLowerlimit && report.cost <= this.state.costUpperLimit;
     })
