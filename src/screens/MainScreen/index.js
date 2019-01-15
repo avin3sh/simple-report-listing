@@ -105,9 +105,9 @@ export default class index extends Component {
     return (
       this.state.screenResult.map(report => {
         return (
-          <TouchableOpacity onPress={() => this._getReport(report.id)}>
+          <div className="cardHolder" onClick={() => this._getReport(report.id)}>
             <ReportCard report={report} />
-          </TouchableOpacity>
+          </div>
         );
       })
     )
