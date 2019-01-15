@@ -66,14 +66,20 @@ export default class index extends Component {
       screenResult: reports,
       showFilterModal: false,
 
+      //individual report modal
+      showContentModal: false,
+      fetchingReport: true,
+
       //sorting
       sortingCriteria: 'rf',
 
-      //modalvalues
+      //filterValues
       costLowerlimit: R.meta.MIN_REPORT_COST,
       costUpperLimit: R.meta.MAX_REPORT_COST,
       date_from: new Date('2010-01-01'),
       date_till: new Date(),
+
+      //
 
     }
 
@@ -84,11 +90,27 @@ export default class index extends Component {
     width: window.innerWidth
   });
 
+  _showModal = () => {
+    this.setState({ showContentModal: true });
+  }
+
+  _hideModal = () => {
+    this.setState({ showContentModal: false });
+  }
+
+  _renderLoadingGif() {
+    return (
+      <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <Image source={require('../../assets/loading.gif')} style={{ height: 255, width: 255 }} />
+      </View>
+    )
+  }
+
   _renderReportsList() {
     return (
       this.state.screenResult.map(report => {
         return (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => this._getReport(report.id)}>
             <ReportCard report={report} />
           </TouchableOpacity>
         );
@@ -96,9 +118,23 @@ export default class index extends Component {
     )
   }
 
+  _getReport(id) {
+    this.setState({
+      showContentModal: true,
+      fetchingReport: true
+    }, () => {
+
+    })
+
+  }
+
   _renderManipulators() {
     return (
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+      }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ flexDirection: 'column' }}>
             <TextInput
@@ -165,8 +201,7 @@ export default class index extends Component {
 
   _renderFilterModal() {
     return (
-      <View style={{ flexDirection: 'column', justifyContent: 'center', }}>
-
+      <View style={styles.filterModal}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTextLabelStyle}>Cost: </Text>
           <Text style={styles.modalTextLabelStyle}>$</Text>
@@ -233,7 +268,6 @@ export default class index extends Component {
             onPress={() => this.setState({ showFilterModal: false })}
           />
         </View>
-
       </View>
     );
   }
@@ -326,12 +360,13 @@ export default class index extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.state.showFilterModal && this._renderFilterModal()}
         <View ref='header' style={styles.headerArea}>
           <Image source={require('../../assets/logo.png')} style={{ width: 240, height: 30 }} />
           <Text>{R.meta.COMPANY_CONTACT}</Text>
         </View>
         <View style={styles.hr} />
+
+
 
         <View ref='content' style={styles.content}>
           <View style={styles.contentHeader}>
@@ -339,16 +374,39 @@ export default class index extends Component {
           </View>
 
           <View style={styles.resultArea}>
-            {this._renderManipulators()}
-            <View style={styles.hrSecondary} />
-            {this._renderReportsList()}
+            <View>
+              {this._renderManipulators()}
+              {this.state.showFilterModal && this._renderFilterModal()}
+              <View style={styles.hrSecondary} />
+            </View>
+            <View>
+              {this._renderReportsList()}
+            </View>
           </View>
         </View>
+
+        <Modal show={this.state.showContentModal} handleClose={this._hideModal} >
+          {this.state.fetchingReport && this._renderLoadingGif()}
+        </Modal>
 
       </View>
     )
   }
 }
+
+const Modal = ({ handleClose, show, children }) => {
+  const showHideClassName = show ? "modal display-block" : "modal display-none";
+
+  return (
+    <div className={showHideClassName}>
+      <section className="modal-main">
+        {children}
+        <Button title="Close" onPress={handleClose} />
+      </section>
+    </div>
+  );
+};
+
 
 const styles = StyleSheet.create({
 
@@ -362,6 +420,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
     marginBottom: 5
   },
 
@@ -394,6 +453,15 @@ const styles = StyleSheet.create({
   },
 
   resultArea: {
+
+  },
+
+  filterModal: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignSelf: 'flex-end'
+
+    //overlaysorcery
 
   },
 
