@@ -5,6 +5,7 @@ const R = {
         COMPANY_CONTACT: '+1 617-765-2493',
         MIN_REPORT_COST: 0,
         MAX_REPORT_COST: 10000,
+        DATABASE_UPDATE_INTERVAL: 600000,//10minutes
         api: {
             URL: 'https://5c3c5b9d29429300143fe4c3.mockapi.io/api/v1/reports/',
         }

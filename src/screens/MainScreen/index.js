@@ -441,16 +441,38 @@ export default class index extends Component {
         this.setState({
           allreports: reportsJson,
           screenResult: reportsJson,
-        },
-          () => { this.setState({ firstLoad: true }) }
-        )
+        }, () => {
+          this.setState({ firstLoad: true });
+          setInterval(() => {//keep updating DB every 10 minutes
+            this.dynamicDBUpdate();
+          }, R.meta.DATABASE_UPDATE_INTERVAL);
+        })
+
       })
       .catch(err => {
         console.log(err);
         alert(R.dashboard.errors.FIRST_LOAD_FETCH_ERROR);
       })
 
+
+
     window.removeEventListener('resize', this._handleResize);
+  }
+
+  dynamicDBUpdate() {
+    fetch(R.meta.api.URL)
+      .then(resp => resp.json())
+      .then(reportsJson => {
+
+        this.setState({
+          allreports: reportsJson,
+        })
+
+      })
+      .catch(err => {
+        console.log(err);
+        //probably browser is offline
+      })
   }
 
   render() {
