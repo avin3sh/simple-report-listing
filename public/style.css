@@ -26,6 +26,11 @@
   display: none;
 }
 
+/*Report Card Container on MainScreen for Individual Cards*/
+.reportCardContainer{
+  cursor: pointer;
+}
+
 
 /*Suggestion Autocomplete Box*/
 .suggestionBoxContainer{
