@@ -23,9 +23,11 @@ export default function index(props) {
             <Image source={{ uri: report.image }} style={{ width: 120, height: 150 }} />
             <View style={styles.content}>
                 <Text style={styles.title}>{report.title}</Text>
+                <View style={styles.meta_data}>
+                    <Text style={styles.published}>{R.report_card.PUBLISHED_LABEL}: {getMonthYear(report.published_on)}</Text>
+                    <Text style={styles.cost}>{R.report_card.COST_LABEL}: {report.currency}{report.cost}</Text>
+                </View>
                 <Text style={styles.description}>{report.description}</Text>
-                <Text style={styles.published}>{R.report_card.PUBLISHED_LABEL}: {getMonthYear(report.published_on)}</Text>
-                <Text style={styles.cost}>{R.report_card.COST_LABEL}: {report.currency}{report.cost}</Text>
             </View>
         </View >
     );
@@ -68,12 +70,16 @@ const styles = StyleSheet.create({
     published: {
         color: '#62717c',
         fontSize: 13,
-        marginBottom: 5
     },
 
     cost: {
         color: '#62717c',
         fontSize: 13,
+        marginLeft: 7,
+    },
+    meta_data: {
+        flexDirection: 'row',
         marginBottom: 5
     }
+
 })

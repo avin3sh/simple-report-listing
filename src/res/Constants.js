@@ -45,7 +45,8 @@ const R = {
 
     report_card: {
         PUBLISHED_LABEL: 'PUBLISHED',
-        COST_LABEL: 'COST OF REPORT'
+        COST_LABEL: 'COST OF REPORT',
+        MAX_DESCRIPTION_LENGTH: 250,
     }
 }
 

@@ -14,6 +14,20 @@ function getMonthYear(timeISO) {
     return ('' + month + ' ' + year);
 }
 
+function trimDescription(description) {
+  
+    let newDescription = description.substr(0, R.report_card.MAX_DESCRIPTION_LENGTH-1);
+
+    //re-trim if a word has been cut in between
+    newDescription = newDescription.substr(0, Math.min(newDescription.length, newDescription.lastIndexOf(" ")))
+
+    if(description.length >=R.report_card.MAX_DESCRIPTION_LENGTH){
+        newDescription += "...";
+    }
+
+    return newDescription;
+}
+
 
 export default function index(props) {
     const report = props.report;
@@ -22,7 +36,7 @@ export default function index(props) {
             <Image source={{ uri: report.image }} style={{ width: 120, height: 150 }} />
             <View style={styles.content}>
                 <Text style={styles.title}>{report.title}</Text>
-                <Text style={styles.description}>{report.description}</Text>
+                <Text style={styles.description}>{trimDescription(report.description)}</Text>
                 <Text style={styles.published}>{R.report_card.PUBLISHED_LABEL}: {getMonthYear(report.published_on)}</Text>
                 <Text style={styles.cost}>{R.report_card.COST_LABEL}: {report.currency}{report.cost}</Text>
             </View>
@@ -49,7 +63,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         marginLeft: 8,
-        width:'85%',
+        width: '85%',
         maxWidth: '100%',
     },
 
