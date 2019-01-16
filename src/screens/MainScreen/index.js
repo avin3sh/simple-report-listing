@@ -186,7 +186,7 @@ export default class index extends Component {
         </View>
 
 
-        <View style={{ flexDirection: 'row', alignSelf: 'flex-end', justifyContent: 'center' }}>
+        <View style={[{ flexDirection: 'row', alignSelf: 'flex-end', justifyContent: 'center' }, styles.lowZIndex]}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text>{R.dashboard.result_manipulators.SORT_LABEL}: </Text>
             <Picker
