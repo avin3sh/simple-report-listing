@@ -376,8 +376,9 @@ export default class index extends Component {
 
     let previousSearches = this.state.previousSearches;
     let thisSearch = { title: q, searched: true };
-    if (previousSearches.indexOf(thisSearch) === -1)
-      previousSearches.push();
+    if (!previousSearches.some(element => { return element.title === q })) {
+      previousSearches.push(thisSearch);
+    }
 
     this.setState({ screenResult: result, previousSearches: previousSearches },
       () => {
