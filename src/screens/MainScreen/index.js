@@ -163,10 +163,10 @@ export default class index extends Component {
               <div className="suggestionBoxContainer">
                 {this.state.suggestions.map(suggestion => {
                   let suggestionLength = R.dashboard.result_manipulators.search.MAX_SUGGESTION_LENGTH;
-                  if(suggestion.searched) suggestionLength-=10;//removing 10 characters to show 'searched:' label
+                  if (suggestion.searched) suggestionLength -= 10;//removing 10 characters to show 'searched:' label
                   return (
                     <span className="suggestionBoxItems" onClick={() => { this.setState({ query: suggestion.title, suggestions: [] }) }}>
-                      {suggestion.searched ? (<span className="suggestionSearchedLabel">searched: </span>):null}
+                      {suggestion.searched ? (<span className="suggestionSearchedLabel">searched: </span>) : null}
                       {suggestion.title.substr(0, suggestionLength)}
                       {suggestion.title.length > suggestionLength ? "..." : null}
                     </span>
@@ -375,7 +375,9 @@ export default class index extends Component {
     }
 
     let previousSearches = this.state.previousSearches;
-    previousSearches.push({ title: q, searched: true });
+    let thisSearch = { title: q, searched: true };
+    if (previousSearches.indexOf(thisSearch) === -1)
+      previousSearches.push();
 
     this.setState({ screenResult: result, previousSearches: previousSearches },
       () => {
