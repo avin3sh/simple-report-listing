@@ -65,6 +65,8 @@ const styles = StyleSheet.create({
     description: {
         fontSize: 14,
         marginBottom: 5,
+        maxHeight: '100%',
+        overflow: 'scroll'
     },
 
     published: {
