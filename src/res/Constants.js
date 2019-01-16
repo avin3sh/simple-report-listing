@@ -22,6 +22,12 @@ const R = {
                 OLDEST_FIRST: 'Oldest - First',
                 COST_LOW: 'Cost - Low',
                 COST_HIGH: 'Cost - High'
+            },
+
+            search: {
+                MAX_DB_SUGGESTIONS: 5,
+                MAX_ALREADY_SEARCHED_SUGGESTIONS: 3,
+                MAX_SUGGESTION_LENGTH: 30
             }
         },
 

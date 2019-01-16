@@ -25,6 +25,10 @@ export default class index extends Component {
       allreports: [],
       screenResult: [],
 
+      //autocomplete
+      previousSearches: [],
+      suggestions: [],
+
       //flags
       showFilterModal: false,
       firstLoad: false,
@@ -105,7 +109,7 @@ export default class index extends Component {
     return (
       this.state.screenResult.map(report => {
         return (
-          <section onClick={() => this._getReport(report.id)}>
+          <section onClick={() => this._getReport(report.id)} className="reportCardContainer">
             <ReportCard report={report} />
           </section>
         );
@@ -143,7 +147,7 @@ export default class index extends Component {
             <TextInput
               value={this.state.query}
               placeholder={R.dashboard.result_manipulators.SEARCHBOX_PLACEHOLDER}
-              style={{ height: 30, width: 250, borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }}
+              style={{ height: 30, width: '250px', borderBottomWidth: 1, borderBottomColor: '#f3f3f3' }}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   this.search();
@@ -151,11 +155,25 @@ export default class index extends Component {
 
               }}
               onChangeText={(value) => {
-                this.setState({
-                  query: value
-                })
+                this._handleUserTyping(value);
               }}
             />
+
+            <View style={styles.suggestionBox}>
+              <div className="suggestionBoxContainer">
+                {this.state.suggestions.map(suggestion => {
+                  let suggestionLength = R.dashboard.result_manipulators.search.MAX_SUGGESTION_LENGTH;
+                  if(suggestion.searched) suggestionLength-=10;//removing 10 characters to show 'searched:' label
+                  return (
+                    <span className="suggestionBoxItems" onClick={() => { this.setState({ query: suggestion.title, suggestions: [] }) }}>
+                      {suggestion.searched ? (<span className="suggestionSearchedLabel">searched: </span>):null}
+                      {suggestion.title.substr(0, suggestionLength)}
+                      {suggestion.title.length > suggestionLength ? "..." : null}
+                    </span>
+                  )
+                })}
+              </div>
+            </View>
 
           </View>
 
@@ -201,6 +219,27 @@ export default class index extends Component {
         </View>
       </View>
     )
+  }
+
+  _handleUserTyping(value) {
+    const q = value.trim();
+    this.setState({
+      query: value
+    })
+
+    const suggestionDB = this.state.allreports.concat(this.state.previousSearches);
+    let result = [];
+    if (q.length > 2) {//give suggestions only if keyword is more than 3 chars long
+      result = suggestionDB.filter(report => {
+        let text = report.title;
+        return text.toUpperCase().includes(q.toUpperCase());
+      })
+    }
+
+    this.setState({
+      suggestions: result.slice(0, R.dashboard.result_manipulators.search.MAX_DB_SUGGESTIONS)//show only five suggestions
+    })
+
   }
 
   _renderFilterClearBtn() {
@@ -335,7 +374,10 @@ export default class index extends Component {
       result = db;
     }
 
-    this.setState({ screenResult: result },
+    let previousSearches = this.state.previousSearches;
+    previousSearches.push({ title: q, searched: true });
+
+    this.setState({ screenResult: result, previousSearches: previousSearches },
       () => {
         this.setState({
           searching: false
@@ -430,7 +472,7 @@ export default class index extends Component {
               {this.state.showFilterModal && this._renderFilterModal()}
               <View style={styles.hrSecondary} />
             </View>
-            <View>
+            <View style={styles.lowZIndex}>
               {this._renderResultHelper()}
               {(!this.state.firstLoad || this.state.searching) && this._renderLoadingGif()}
               {(this.state.firstLoad && !this.state.searching) && this._renderReportsList()}
@@ -492,7 +534,8 @@ const styles = StyleSheet.create({
     borderWidth: '1px',
     borderColor: '#c5c8cb',
     marginBottom: 5,
-    marginTop: 5
+    marginTop: 5,
+    zIndex: -1
   },
 
   content: {
@@ -554,4 +597,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexWrap: 'wrap',
   },
+
+  lowZIndex: {
+    zIndex: -1
+  },
+
+  suggestionBox: {
+    zIndex: 10,
+    position: 'absolute',
+    marginTop: 31
+  }
+
+
+
+
 })
